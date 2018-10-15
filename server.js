@@ -3,7 +3,6 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var exphbs = require("express-handlebars");
-require("dotenv").config();
 
 // Our scraping tools
 var request = require("request");
@@ -13,7 +12,7 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = process.env.PORT|| 3000;
+var PORT = process.env.PORT || 3000;
 
 // Initialize Express
 var app = express();
@@ -41,7 +40,6 @@ app.set("view engine", "handlebars");
 // var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
 // mongoose.Promise = Promise;
 // mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
-//mongoose.connect("mongodb://localhost/mongoHeadlines", { useNewUrlParser: true });
 var databaseUri = "mongodb://localhost/mongoHeadlines";
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI);
@@ -49,13 +47,6 @@ if (process.env.MONGODB_URI) {
 else {
   mongoose.connect(databaseUri);
 }
-// var db = mongoose.connection;
-// db.on('error', function(err) {
-//   console.log('Mongoose Error: ', err);
-// });
-// db.once('open', function() {
-//   console.log('Mongoose connection successful.');
-// });
 
 // Routes
 
