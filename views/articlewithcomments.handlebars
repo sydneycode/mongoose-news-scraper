@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h1>Mongoose Dressage News Scraper</h1>
+            <a href="/articles"><h1>Mongoose Dressage News Scraper</h1></a>
         </div>
     </div>
     <div class="row">
@@ -16,7 +16,7 @@
                     <div class="row">
                         <div class="col-4">
                             <h4>{{article.headline}}</h4>
-                            <p>(ID: {{article._id}})</p>
+                            {{!-- <p>(ID: {{article._id}})</p> --}}
                         </div>
                         <div class="col-0"></div>
                         <div class="col-5">
@@ -38,17 +38,15 @@
                 {{#each article.comments}}
                 <li class="list-group-item">
                     <div class="row">
-                        <div class="col-2">
+                        <div class="col-4">
                             <h4>{{username}}</h4>
                         </div>
-                        <div class="col-4"></div>
-                        <div class="col-3">
+                        <div class="col-0"></div>
+                        <div class="col-5">
                             <p>{{text}}</p>
                         </div>
                         <div class="col-3">
-                            <br>
-                            <a href="">
-                            <button class="btn btn-primary" type="button" data-id="{{_id}}">Delete Comment</button></a>
+                            <button class="btn btn-primary delete" type="button" data-id="{{_id}}">Delete Comment</button>
                         </div>
                     </div>
                 </li>
@@ -61,16 +59,19 @@
         <div class="col-7">
             <form>
                 <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" class="form-control" id="username">
+                    <label for="new-username">Username:</label>
+                    <input type="text" class="form-control" id="new-username">
                 </div>
                 <div class="form-group">
-                    <label for="comment"></label>
-                    <textarea class="form-control" rows="4" placeholder="Enter your comment..."></textarea>
+                    <label for="new-comment"></label>
+                    <textarea class="form-control" rows="4" placeholder="Enter your comment..." id="new-comment"></textarea>
                 </div>
-                <button class="btn btn-primary">Post Comment</button>
+                <button type="button" class="btn btn-primary post" data-id="{{article._id}}">Post Comment</button>
             </form>
             <br><br>
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/app-comments.js"></script>
