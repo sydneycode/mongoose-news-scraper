@@ -37,9 +37,9 @@ app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB (connect to remote mongolab database if deployed; 
 // otherwise connect to the local mongoHeadlines database)
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+var MONGOLAB_MAUVE_URI = process.env.MONGOLAB_MAUVE_URI || "mongodb://localhost/mongoHeadlines";
 mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGOLAB_MAUVE_URI);
 //mongoose.connect("mongodb://localhost/mongoHeadlines", { useNewUrlParser: true });
 
 // Routes
