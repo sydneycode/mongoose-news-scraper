@@ -3,7 +3,7 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var exphbs = require("express-handlebars");
-require("dotenv").config();
+//require("dotenv").config();
 
 // Our scraping tools
 var request = require("request");
