@@ -2,6 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
+var exphbs = require("express-handlebars");
 
 // Our scraping tools
 var request = require("request");
@@ -25,6 +26,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use express.static to serve the public folder as a static directory
 app.use(express.static("public"));
 
+// Handlebars
+app.engine(
+  "handlebars",
+  exphbs({
+    defaultLayout: "main"
+  })
+);
+app.set("view engine", "handlebars");
+
 // Connect to the Mongo DB (connect to remote mongolab database if deployed; 
 // otherwise connect to the local mongoHeadlines database)
 //var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
@@ -36,13 +46,13 @@ mongoose.connect("mongodb://localhost/mongoHeadlines", { useNewUrlParser: true }
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with request
-  //axios.get("http://dressage-news.com/").then(function(response) {
-  request("http://dressage-news.com/", function(error, response, html) {
+  axios.get("http://dressage-news.com/").then(function(response) {
+  //request("http://dressage-news.com/", function(error, response, html) {
 
     // Load the HTML into cheerio and save it to a variable
   // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
-  var $ = cheerio.load(html);
-  //var $ = cheerio.load(response.data);
+  //var $ = cheerio.load(html);
+  var $ = cheerio.load(response.data);
 
   $("article").each(function(i, element) {
     var result = {};
@@ -67,7 +77,9 @@ app.get("/scrape", function(req, res) {
         .attr("href");
     console.log(result.url);
 
-    db.Article.create(result)
+    // Check to see if the article already exists in the database; if it does, don't add another copy; 
+    // but if it doesn't, then insert the article into the database
+    db.Article.findOneAndUpdate({headline: result.headline}, result, {upsert: true})
       .then(function(dbArticle) {
         // View the added result in the console
         console.log(dbArticle);
@@ -76,42 +88,45 @@ app.get("/scrape", function(req, res) {
         // If an error occurred, send it to the client
         return res.json(err);
       });
-  });
+    });
 
-  // If we were able to successfully scrape and save an Article, send a message to the client
-  res.send("Scrape Complete");
+    // If we were able to successfully scrape and save an Article, send a message to the client
+    
+    res.send("Scrape Complete");
     });
 });
 
 // Route for getting all Articles from the db
-// app.get("/articles", function(req, res) {
-//   // Grab every document in the Articles collection
-//   db.Article.find({})
-//     .then(function(dbArticle) {
-//       // If we were able to successfully find Articles, send them back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
+app.get("/articles", function(req, res) {
+  // Grab every document in the Articles collection
+  db.Article.find({})
+    .then(function(dbArticle) {
+      // If we were able to successfully find Articles, send them back to the client
+      res.render("allarticles", {articles: dbArticle});
+      //res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
 
-// // Route for grabbing a specific Article by id, populate it with it's note
-// app.get("/articles/:id", function(req, res) {
-//   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-//   db.Article.findOne({ _id: req.params.id })
-//     // ..and populate all of the notes associated with it
-//     .populate("note")
-//     .then(function(dbArticle) {
-//       // If we were able to successfully find an Article with the given id, send it back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
+// Route for grabbing a specific Article by id, populate it with it's note
+app.get("/articles/:id", function(req, res) {
+  // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
+  db.Article.findOne({ _id: req.params.id })
+    // ..and populate all of the notes associated with it
+    .populate("comments")
+    .then(function(dbArticle) {
+      // If we were able to successfully find an Article with the given id, send it back to the client
+      res.render("articlewithcomments", {article: dbArticle});
+      //res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
 
 // // Route for saving/updating an Article's associated Note
 // app.post("/articles/:id", function(req, res) {

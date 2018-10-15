@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Mongoose Dressage News Scraper</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <p>All scraped articles:</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <ul class="list-group">
+                {{#each articles}}
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-4">
+                            <h4>{{headline}}</h4>
+                            <p>(ID: {{_id}})</p>
+                        </div>
+                        <div class="col-0"></div>
+                        <div class="col-5">
+                            <p>{{summary}}</p>
+                            <p><a href="{{url}}">{{url}}</a></p>
+                        </div>
+                        <div class="col-3">
+                            <br>
+                            <a href="/articles/{{_id}}">
+                            <button class="btn btn-primary" type="button" data-id="{{_id}}">View Comments</button></a>
+                        </div>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+            <br><br>
+        </div> 
+    </div>
+</div>
