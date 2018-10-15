@@ -38,12 +38,41 @@ app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB (connect to remote mongolab database if deployed; 
 // otherwise connect to the local mongoHeadlines database)
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
-mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
+// var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+// mongoose.Promise = Promise;
+// mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 //mongoose.connect("mongodb://localhost/mongoHeadlines", { useNewUrlParser: true });
+var databaseUri = "mongodb://localhost/mongoHeadlines";
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI);
+}
+else {
+  mongoose.connect(databaseUri);
+}
+var db = mongoose.connection;
+db.on('error', function(err) {
+  console.log('Mongoose Error: ', err);
+});
+db.once('open', function() {
+  console.log('Mongoose connection successful.');
+});
 
 // Routes
+
+// Route for getting all Articles from the db
+app.get("/", function(req, res) {
+  // Grab every document in the Articles collection
+  db.Article.find({})
+    .then(function(dbArticle) {
+      // If we were able to successfully find Articles, send them back to the client
+      res.render("allarticles", {articles: dbArticle});
+      //res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
 
 // A GET route for scraping the Dressage-News website
 app.get("/scrape", function(req, res) {
@@ -95,21 +124,6 @@ app.get("/scrape", function(req, res) {
 
     // If we were able to successfully scrape and save an Article, send a message to the client
     res.send("Scrape Complete");
-    });
-});
-
-// Route for getting all Articles from the db
-app.get("/", function(req, res) {
-  // Grab every document in the Articles collection
-  db.Article.find({})
-    .then(function(dbArticle) {
-      // If we were able to successfully find Articles, send them back to the client
-      res.render("allarticles", {articles: dbArticle});
-      //res.json(dbArticle);
-    })
-    .catch(function(err) {
-      // If an error occurred, send it to the client
-      res.json(err);
     });
 });
 
